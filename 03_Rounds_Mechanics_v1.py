@@ -26,6 +26,7 @@ def check_rounds():
 
 rounds_played = 0
 choose_instruction = "Please choose a number between _ and _"
+number_error = "Please choose  a number between 1 and '???'"
 
 # Ask user for # of rounds, <enter> for infinite mode
 rounds = check_rounds()
@@ -45,11 +46,16 @@ while end_game == "no":
         print()
 
     print(heading)
-    choose = int(input("{} or 'xxx' to "
-                       "end: ".format(choose_instruction)))
+    choose = input("{} or 'xxx' to "
+                       "end: ".format(choose_instruction))
 
-    if choose == "xxx":
+    if choose > -1:
+        continue
+    elif choose == "xxx":
         break
+    else:
+        print(number_error)
+
 
     # rest of loop / game
     print("You chose {}".format(choose))
