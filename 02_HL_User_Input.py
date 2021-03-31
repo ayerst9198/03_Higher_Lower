@@ -1,3 +1,5 @@
+import random
+
 # HL component 1 - Get and check user inpput
 
 # To Do
@@ -16,9 +18,7 @@ def int_check(question, low=None, high=None):
     elif low is not None and high is None:
         situation = "low only"
 
-
     while True:
-
         try:
             response = int(input(question))
 
@@ -26,7 +26,7 @@ def int_check(question, low=None, high=None):
             # too low. if both upper and lower bounds
             # are specified
             if situation == "both":
-                if response <low or response > high:
+                if response < low or response > high:
                     print("Please enter a number between "
                           "{} and {}".format(low, high))
                     continue
@@ -48,5 +48,18 @@ def int_check(question, low=None, high=None):
 
 # Main routine
 
+
+start = ""
 lowest = int_check("Low Number: ")
-highest = int_check("High Number: ", lowest +1)
+highest = int_check("High Number: ", lowest + 10)
+rounds = int_check("No. of Round: ", 10)
+ans = random.randint(lowest, highest)
+rounds_played = 1
+while start == "":
+    print()
+    print("Round: {}".format(rounds_played))
+    guess = int_check("Guess: ", lowest, highest)
+    rounds_played += 1
+    if guess == ans:
+        print("program continues")
+        start = "xxx"
