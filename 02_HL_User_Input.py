@@ -10,55 +10,59 @@ import random
 
 
 # Number checking function goes here
-def int_check(question, low=None, high=None):
-    situation = ""
+def num_check(question, error, low=None, high=None):
 
-    if low is not None and high is not None:
-        situation = "both"
-    elif low is not None and high is None:
-        situation = "low only"
-
-    while True:
+    valid = False
+    while not valid:
         try:
             response = int(input(question))
 
-            # checks input is not too high or
-            # too low. if both upper and lower bounds
-            # are specified
-            if situation == "both":
-                if response < low or response > high:
-                    print("Please enter a number between "
-                          "{} and {}".format(low, high))
+            if low is not None and high is not None:
+                if low <= response <= high:
+                    return response
+                else:
+                    print(error)
+                    print()
                     continue
 
-            # checks input is not too low
-            elif situation == "low only":
-                if response > low:
-                    print("Please enter a number that is more "
-                          "than (or equal to) {}".format(low))
+            elif low is not None:
+                if response >= low:
+                    return response
+                else:
+                    print(error)
+                    print()
                     continue
 
-            return response
+            elif high is not None:
+                if response <= high:
+                    return response
+                else:
+                    print(error)
+                    print()
+                    continue
 
-        # checks input is a integer
+            else:
+                return response
+
         except ValueError:
-            print("Please enter an integer")
-            continue
+            print(error)
+            print()
 
 
 # Main routine
 
 
 start = ""
-lowest = int_check("Low Number: ")
-highest = int_check("High Number: ", lowest + 10)
-rounds = int_check("No. of Round: ", 10)
+lowest = num_check("Low Number: ", "Enter an integer above 0", 1)
+highest = num_check("High Number: ", "Please enter a integer above {}".format(lowest), lowest + 1)
+rounds = num_check("No. of Round: ", " Please enter an integer above 0", 0)
 ans = random.randint(lowest, highest)
+print(ans)
 rounds_played = 1
 while start == "":
     print()
     print("Round: {}".format(rounds_played))
-    guess = int_check("Guess: ", lowest, highest)
+    guess = num_check("Guess: ", "Please enter an integer between {}, and {}".format(lowest, highest), lowest, highest)
     rounds_played += 1
     if guess == ans:
         print("program continues")
