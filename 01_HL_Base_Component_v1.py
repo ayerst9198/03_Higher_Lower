@@ -10,7 +10,7 @@ def num_check(question, error, low=None, high=None, exit_code=None, konami_code=
         try:
             response = input(question).lower()
 
-            if response == exit_code:
+            if response == exit_code or konami_code or impossible_mode:
                 return response
             else:
                 response = int(response)
@@ -575,6 +575,7 @@ if show_instructions == "yes":
 elif show_instructions == "no":
     instructions()
 
+# Easter egg
 elif show_instructions == "RPS":
     RPS = "true"
     while RPS == "true":
@@ -586,28 +587,26 @@ elif show_instructions == "RPS":
             break
         
 
+# Initial setup gets range
+num_won = 0
+lowest = num_check("Low Number: ", "Enter an integer above 0", 1)
+highest = num_check("High Number: ", "Please enter a integer above {}".format(lowest), lowest + 1)
 
 # asks for number of rounds
 rounds_lost = 0
 rounds_drawn = 0
 rounds_played = 0
-rounds = num_check("How many rounds? ", "oops", 0, exit_code="")
+rounds = num_check("How many rounds? ", "oops", 0, exit_code="", konami_code="UpUpDownDownLeftRightLeftRightBAStart", impossible_mode="i")
 # list to hold user guesses and help prevent duplicates
 already_guessed = []
 
-# Initial setup gets range
-num_won = 0
-lowest = num_check("Low Number: ", "Enter an integer above 0", 1)
-highest = num_check("High Number: ", "Please enter a integer above {}".format(lowest), lowest + 1)
+
 
 # calculates maximum number of guesses based on binary search strategy
 num_range = highest - lowest + 1
 max_raw = math.log2(num_range)
 max_upped = math.ceil(max_raw)
 max_guesses = max_upped + 1
-
-# secret variable used for impossible mode
-chicken = 0
 
 print()
 
@@ -628,13 +627,20 @@ while play_again == "yes":
         secret = ans
         print("Spoiler Alert", secret)
         guesses_allowed = max_guesses
+
+        # Already guessed list
+        already_guessed = []
         
         while guess != secret and guesses_allowed >= 1:
-
             # continuous mode (never ends)
             if rounds == "":
                 print("Max Guesses: {}".format(max_guesses))
-                already_guessed = []
+                
+                # Quit Mechanism
+                if guess == "xxx":
+                    print("You Quit")
+                    play_again = "no"
+                    break
 
                 guess_instruction ="Guess: "
                 guess_error = "Please enter a number between {} and {}".format(lowest, highest)
@@ -653,12 +659,6 @@ while play_again == "yes":
                 already_guessed.append(guess)
 
                 # Checks answer and compares it to hidden number
-
-                # Quit Mechanism
-                if guess == "xxx":
-                    print("You Quit")
-                    play_again = "no"
-                    break
 
                 # checks if you are allowed to guess
                 if guesses_allowed >= 1:
@@ -698,23 +698,31 @@ while play_again == "yes":
             # Easy mode (user is always right)
 
             # konami code easter egg (user is always right, and has infinite guesses)
-            if rounds == "UpUpDownDownLeftRightLeftRightBAStart":
-                heading = statement_generator("konami mode guess {}".format(rounds_played), "$", "")
-                guess = num_check("Guess: {}".format(guesses_allowed), "Please enter an integer between {} and {}".format(lowest, highest))
-                secret = guess
-                guesses_allowed = "infinity"
+            elif rounds == "upupdowndownleftrightleftrightbastart":
 
-                print("You got it right")
+                # Easy mode heading 
+                heading = statement_generator("konami mode guess {}".format(rounds_played), "$", "")
+
+                # ask user for guess
+                guess = num_check("Guess: ", "Please enter an integer between {} and {}".format(lowest, highest), exit_code="xxx")
+
+                # Exit game if Exit code typed
                 if guess == "xxx":
                     play_again = "no"
                     print("you quit lol")
                     break
-            
-            # impossible mode
+                
+                # Allows user to always win
+                secret = guess
+                guesses_allowed = "9.99999999E x 10^99"
 
-            # impossible mode easter egg makes user always wrong
+                print("You got it right")
+                print("Guesses left", guesses_allowed)
+                rounds_played += 1
+            
+
+            # Impossible mode easter egg makes user always wrong
             elif rounds == "i":
-                print("Max Guesses: {}".format(max_guesses))
                 heading = statement_generator("Impossible Mode: Guesses left: 1".format(rounds_played + 1), "x", "")
                 
                 # answer is a decimal so user will always be wrong
@@ -728,17 +736,11 @@ while play_again == "yes":
                 
                 # losingh message
                 print("you lose")
-                while chicken == 0:
-                    print("you suck " * 1000)
+                rounds_played += 1
 
             # Normal Mode:
-
             # User inputs a highest and a lowest, and guesses, with limited tries
             else:
-
-                # displays how many guesses user has left
-                print("Guesses Left: {}".format(guesses_allowed))
-
                 # user inputs a guess, w/ error
                 guess = num_check("Guess: ".format(guesses_allowed), "Please enter an integer between {} and {}".format(lowest, highest))
 
@@ -755,29 +757,32 @@ while play_again == "yes":
 
                 # Checks answer and compares it to hidden number
                 if guesses_allowed >= 1:
-
-                     # if the guess is less than the answer, tell them to try a higher num
+                    # if the guess is less than the answer, tell them to try a higher num
                     if guess < secret:
-                        print("Too low, try a higher number.   Guesses left: {}".format(guesses_allowed))
+                        print("Too low, try a higher number")
                         print()
 
                      # if the guess is higher than the answer, tell them to try a lower num
                     elif guess > secret:
-                        print("Too high, try a lower number.   Guesses left; {}".format(guesses_allowed))
+                        print("Too high, try a lower number")
                         print()
                 else:
 
                     # if user runs out of guesses and final guess is lower than ans:
-                    if guess < secret:
+                    if guess < secret and rounds == rounds_played + 1:
                         print("Too low! Game Over!")
                         print("Answer; {}".format(secret))
-                        print()
+                        break
                     
                     # if user runs out of guesses and final guess is higher than ans:
-                    elif guess > secret:
+                    elif guess > secret and rounds == rounds_played + 1:
                         print("Too high! Game Over!")
                         print("Answer; {}".format(secret))
-                        print()
+                        break
+
+                # displays how many guesses user has left
+                print("Guesses Left: {}".format(guesses_allowed))
+                rounds_played += 1
                 
                 # if user guesses ans, congatulatulate them and end game
                 if guess == secret:
