@@ -15,4 +15,4 @@ def statement_generator(statement, side_decoration, top_bottom_decoration):
     return ""
 
 
-statement_generator(" o ", " l ", " ;) ")
+statement_generator("o", "l", "l")

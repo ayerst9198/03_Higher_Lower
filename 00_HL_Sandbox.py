@@ -1,172 +1,166 @@
-def lucky_you():
+# Higher Lower Fully Working Program
+# Program should work but needs to be tested for usability
 
-    valid = False
-    while not valid:
-        import random
-
-
-        # functions go here
-        def statement_generator(statement, decoration):
-            sides = decoration * 3
-
-            statement = "{} {} {}".format(sides, statement, sides)
-            top_bottom = decoration * len(statement)
-
-            print(top_bottom)
-            print(statement)
-            print(top_bottom)
-
-            return ""
+# import modules
+import random
+import math
 
 
-        def yes_no(question):
-            valid = False
-            while not valid:
-                response = input(question).lower()
+# Check if user is entering an integer correctly.
+def intcheck(question, low=None, high=None):
 
-                if response == "yes" or response == "y":
-                    response = "yes"
-                    return response
+    # sets up an error messages
+    if low is not None and high is not None:
+        error = "❗ Please enter an integer between {} and {} ❗. ".format(low, high)
+        "(inclusive)".format(low, high)
+    elif low is not None and high is None:
+        error = "❗ Please enter an integer that is more than or equal to {} ❗".format(low)
+    elif low is None and high is not None:
+        error = "❗ Please enter an integer that is less than or equal to {} ❗".format(high)
 
-                elif response == "no" or response == "n":
-                    response = "no"
-                    return response
+    else:
+        error = "❗ Please enter an integer ❗"
+    while True:
+        try:
+            response = int(input(question))
+            # Checks response is not too low
+            if low is not None and response < low:
+                print(error)
+                continue
 
-                else:
-                    print("I don't understand. "
-                        "Stop acting smart and just input Yes or No")
+            # Checks response is not too high
+            if high is not None and response > high:
+                print(error)
+                continue
+
+            return response
+        # prints error if user enters a value error
+        except ValueError:
+            print(error)
+            continue
 
 
-        def cont():
-            input("Enter anything to continue the Game :D")
+# statement generator
+def hl_statement(statement, char):
+    print()
+    print(char*len(statement))
+    print(statement)
+    print(char*len(statement))
+    print()
 
+keep_going = ""
+while keep_going == "":
+    # set up place holders
+    num_won = 0
+    num_lost = 0
+    rounds_played = 0
+    game_stats = []
+    bold = "\033[1m"
+    reset = "\033[0;0m"
 
-        def instructions():
-            statement_generator("How to Play", "*")
+    # Main routine
+    print(bold, "⬆ Higher Lower Game ⬇", reset)
+    print("In this game you will be asked to choose a", bold, "high", reset,
+          "and a", bold, "low", reset, "number.")
+    print("You will then need to guess numbers to try and find a secret number.")
+    print("The secret number will be a number in between the high and low numbers that you chose.")
+    print("But don't worry, there will be clues that give you hints to what the number is.")
+    print("Play as many times as you like and try and beat your high score!")
+    print()
+    input("Press enter to begin ")
+    print("------------------------------")
+    low = intcheck("Choose a Low Number: ")
+    high = intcheck("Choose a High Number: ", low + 1)
+    scale = high - low + 1
+    max_raw = math.log2(scale)  # finds maximum # of guesses using binary search
+    max_upped = math.ceil(max_raw)  # rounds up (ceil --> ceiling)
+    max_guesses = max_upped + 1
+    print("Your Max Number of Guesses: {}".format(max_guesses))
+    rounds = intcheck("How many rounds? ")
+    print()
+
+    
+    
+
+    while rounds_played < rounds:
+        secret = random.randint(low, high)
+        guess = ""
+        correct_guesses_left = max_guesses
+
+        while guess != secret and correct_guesses_left > 1:
             print()
-            print("The aim of the game is to make as much money as possible!")
-            print()
-            print("It costs $1 to start a round.")
-            print()
-            print("A random token will be generated from a unicorn, horse, donkey, or zebra:")
-            print()
-            print("Unicorns are worth $4.")
-            print("If you get a Zebra or a Horse, you lose $0.50")
-            print("Watch out for Donkeys!")
-            print("If you get a Donkey, you lose $1!")
-            print()
-            print("When you run out of money; YOU LOSE")
-            print()
-            print("Enjoy!")
-            print()
-            cont()
-            return ""
-
-
-        def num_check(question, low, high):
-            error = "Please enter a whole number between 1 and 10\n"
-
-            valid = False
-            while not valid:
-                try:
-                    # ask the question
-                    response = int(input(question))
-                    # if amount is too low / too high give
-                    if low < response <= high:
-                        return response
-
-                    # output error
-                    else:
-                        print(error)
-                except ValueError:
-                    print(error)
-
-
-        # Main routine goes here...
-        statement_generator("Welcome to the Lucky Unicorn Game", "*")
-        print()
-
-        show_instructions = yes_no("Have you played this "
-                                "game before? ")
-
-        if show_instructions == "no":
-            instructions()
-
-        # Ask user how much they want to play with...
-        statement_generator("START", "+")
-        print()
-        how_much = num_check("How much would you "
-                            "like to play with between $1 and $10? ", 0, 10)
-        balance = how_much
-
-        rounds_played = 0
-        play_again = input("Please press <Enter> to play... ").lower()
-        while play_again == "":
-
-            # increase # of rounds played
-            rounds_played += 1
-
             # print round number
-            print()
-            statement_generator("Round #{}".format(rounds_played), "*")
-            chosen_num = random.randint(1, 100)
-            print()
+            print("Round {}".format(rounds_played + 1))
+            # where the user guesses
+            guess = intcheck("Guess: ")
+            already_guessed = []
+            
+            # checks that guess is not a duplicate
+            if guess in already_guessed:
+                print("You have already guessed that number! Please try again. "
+                      "You still have {} guesses left".format(correct_guesses_left))
+                continue
+            already_guessed.append(guess)
+            correct_guesses_left -= 1
 
-            # Adjust balance
+            if correct_guesses_left >= 1:
 
-            # if the random # is between 1 and 5,
-            # user gets a unicorn (add $4 to the balance)
-            if 1 <= chosen_num <= 5:
-                chosen = "unicorn"
-                balance += 4
-
-            # if the random # is between 6 and 36,
-            # user gets a donkey (subtract $1 from balance)
-            elif 6 <= chosen_num <= 36:
-                chosen = "donkey"
-                balance -= 1
-
-            # token is either horse or zebra...
-            # either way subtract $0.5 from balance
+                if guess < secret:
+                        hl_statement("Too low try a higher number. Guesses left: {}".format(correct_guesses_left - 1), "⬆")
+                elif guess > secret:
+                    hl_statement("Too high, try a lower number. Guesses left: {}".format(correct_guesses_left - 1), "⬇")
             else:
-                # if the number is even, set the chosen
-                # item to horse
-                if chosen_num % 2 == 0:
-                    chosen = "horse"
-                # if the number is odd, set the chosen
-                # item to zebra
-                else:
-                    chosen = "zebra"
-                balance -= 0.5
+                if guess > secret:
+                        print("Too low!")
+                elif guess > secret:
+                    print("Too high!")
+        if guess == secret:
+            if correct_guesses_left == max_guesses - 1:
+                hl_statement("Amazing you got it in one guess!", "✨")
+                num_won += 1
 
-            if chosen == "unicorn":
-                statement_generator("You got a {}. Your balance is ${:.2f}".format(chosen, balance), "$")
-                print()
-            elif chosen == "horse":
-                statement_generator("You got a {}. Your balance is ${:.2f}".format(chosen, balance), "-")
-                print()
-            elif chosen == "zebra":
-                statement_generator("You got a {}. Your balance is ${:.2f}".format(chosen, balance), "%")
-                print()
-            elif chosen == "donkey":
-                statement_generator("You got a {}. Your balance is ${:.2f}".format(chosen, balance), "^")
-                print()
             else:
-                play_again = "xxx"
-                print("You have somehow broken my game.")
-                print("This is an error message and the game will now shut down.")
+                print("✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔")
+                print("Well done you got it in {} guesses".format(max_guesses - correct_guesses_left))
+                num_won += 1
+                print("✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔✔")
+        else:
+            print("Sorry - you lose this round as you have run out of guesses")
+            num_lost += 1
 
-            if balance < 1:
-                play_again = "xxx"
-                print("You have run out of money.")
-                print(statement_generator("Game Over", "'"))
-            else:
-                play_again = input("Press <Enter> to play again "
-                                "or 'xxx' to quit ")
+        game_stats.append(max_guesses - correct_guesses_left)
+        print("Won: {} \t | \t Lost: {}".format(num_won, num_lost))
+        rounds_played += 1
 
-        print()
-        statement_generator("Final Results", "=")
-        statement_generator("Final Balance: ${}".format(balance), ".")
-        print("Thank you for playing")
+    # print game outcomes
+    print("*** Score for Each Round... ***")
+    list_count = 1
+    for item in game_stats:
+        # indicates if game has been won or lost
+        if item > max_guesses:
+            status = "lost, ran out of guesses"
+        else:
+            status = "won"
 
-lucky_you()
+        print("Round {}: {}".format(list_count, item))
+        list_count += 1
+
+    # Calculate statistics
+    print("Game Stats", game_stats)
+    game_stats.sort()
+    best = game_stats[0]
+    worst = game_stats[-1]
+    average = sum(game_stats) / len(game_stats)
+    # Print statistics
+    print()
+    print("*** Summary Statistics ***")
+    print("Best: {}".format(best))
+    print("Worst: {}".format(worst))
+    print("Average: {:.2f}".format(average))
+
+    # Keep going?
+    print()
+    keep_going = input("Press <enter> to play again or any key to quit: ")
+    print()
+#Farewell user
+print("Thank you for playing. Goodbye")
