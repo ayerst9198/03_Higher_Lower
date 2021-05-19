@@ -128,7 +128,8 @@ def instructions():
 
 
 # Main routine
-
+# Welocomes User
+statement_generator("Welcome to Higher Lower", "-", "=")
 
 # ask user if they have played before
 show_instructions = yes_no("Have you played before? ")
@@ -164,10 +165,12 @@ rounds_won = 0
 # Gets number of rounds
 if mode == 1:
     # ask how many rounds user wants to play
-    rounds = num_check("How many rounds? ", "oops", 0, exit_code="")
+    rounds_allowed = num_check("How many rounds? ", "Please enter an integer above 0", 1, exit_code="")
+    rounds = rounds_allowed
     print()
 elif mode == 2:
-    rounds = 5
+    rounds_allowed = 5
+    rounds = rounds_allowed
 
 # list to hold user guesses and help prevent duplicates
 already_guessed = []
@@ -180,8 +183,8 @@ max_guesses = max_upped + 1
 guesses_allowed = max_guesses
 
 # display how many guesses the user has
-statement_generator("Max Guesses per round: {}".format(max_guesses), "*", "")
-print()
+statement_generator("Max Guesses per round: {}".format(max_guesses), "-", "")
+
 
 # loops the code
 guess = ""
@@ -189,8 +192,11 @@ play_again = "yes"
 
 # makes sure that user plays for specified amount of rounds
 while play_again == "yes":
-    
+    rounds = rounds_allowed
+    guess = 10000000
     while rounds_played < rounds:
+
+        guesses_allowed = max_guesses
 
         # randomizes the answer from the high and low numbers given
         secret = random.randint(lowest, highest) 
@@ -198,39 +204,43 @@ while play_again == "yes":
         if mode == 2:
             rounds += 1
 
-        print()
-
-        statement_generator(" Round {} ".format(rounds_played + 1), "*", "")
+        statement_generator(" Round {} ".format(rounds_played + 1), "*", "*")
 
         #  ask user to guess and loop until they are correct / lose
         while guess != secret: 
             # user inputs a guess, w/ error
-            print()
+            
             guess = num_check("Guess: ", "Please enter an integer between {} and {}".format(lowest, highest), exit_code="xxx")
             print()
 
             # quitting mechanism if user inputs xxx
             if guess == "xxx":
-                play_again = "no"
-                rounds_played = rounds + 1
+                rounds = rounds_played - 1
                 statement_generator("You Quit", "-", "")
                 print()
                 break
             
             if guess != secret:
                 if guess < lowest:
-                    print("Please enter a number between {} and {}".format(lowest, highest))
+                    guesses_allowed += 1
+                    print("Please enter a number between {} and {}, or 'xxx' to quit".format(lowest, highest))
+                    continue
                 if guess > highest:
-                    print("Please enter a number between {} and {}".format(lowest, highest))
+                    guesses_allowed += 1
+                    print("Please enter a number between {} and {}, or 'xxx' to quit".format(lowest, highest))
+                    continue
                 # checks that guess is not a duplicate
                 if guess in already_guessed:
                     print("You have already guessed that number! Please try again.")
                     print("You *still* have {} guesses left".format(guesses_allowed))
+                    guesses_allowed += 1
                 
 
 
             if rounds == rounds_played:
-                play_again = "no"
+                
+                rounds = rounds_played
+                
                 statement_generator("GAME OVER", "-", "")
                 break
 
@@ -239,7 +249,7 @@ while play_again == "yes":
             already_guessed.append(guess)
 
             # Checks answer and compares it to hidden number
-            if guesses_allowed >= 1 and guess != secret:                    
+            if guesses_allowed >= 2 and guess != secret:                    
 
                 
 
@@ -256,7 +266,7 @@ while play_again == "yes":
                     guesses_allowed -= 1
 
                 # displays how many guesses user has left
-                statement_generator("Guesses Left: {}".format(guesses_allowed), "g", "-")
+                statement_generator("Guesses Left: {}".format(guesses_allowed), "", "-")
 
             else:
                 # if user runs out of guesses and final guess is lower than ans:
@@ -264,9 +274,9 @@ while play_again == "yes":
                     statement_generator("Too low! Game Over!", "*", "")
                     print("Answer; {}".format(secret))
                     result = "lose"
-                    rounds_played += 1
                     game_summary.append(result)
                     rounds_lost += 1
+                    rounds_played += 1
                     already_guessed.clear()
                     break
                 
@@ -274,16 +284,16 @@ while play_again == "yes":
                 elif guess > secret:
                     statement_generator("Too high! Game Over!", "*", "")
                     print("Answer; {}".format(secret))
-                    rounds_played += 1
                     result = "lose"
                     game_summary.append(result)
                     already_guessed.clear()
                     rounds_lost += 1
+                    rounds_played += 1
                     break
 
             
                 # if user guesses ans, congatulatulate them and end game
-                if guess == secret:
+                elif guess == secret:
                     statement_generator("You got it right", "!", "-")
                     rounds_won += 1
                     print()
@@ -294,40 +304,57 @@ while play_again == "yes":
         
 
 
-# **** Calculate Game Stats ****
-percent_win = rounds_won / rounds_played * 100
-percent_lose = rounds_lost / rounds_played * 100
-
-# Asks user if they want to see there history
-show_history = yes_no("Would you like to see game history? ")
-
-# displays history if user says yes
-if show_history == "yes":
+    # **** Calculate Game Stats ****
+    percent_win = rounds_won / rounds_played * 100
+    percent_lose = rounds_lost / rounds_played * 100
     print()
-    statement_generator("Game History", "*", "*")
-    for game in game_summary:
-        print(game)
-
-
-
-# Doesnt display history if user says no
-elif show_history == "no":
+    print(rounds_won)
+    print(rounds_played)
+    print(rounds_lost)
+    print(percent_lose)
+    print(percent_win)
     print()
-    print("Thanks for Playing")
 
-# asks user if they want to see the game stats
-game_results = yes_no("Do you want to see your game stats? ")
+    # Asks user if they want to see there history
+    show_history = yes_no("Would you like to see game history? ")
 
-if game_results == "yes":
+    # displays history if user says yes
+    if show_history == "yes":
+        print()
+        statement_generator("Game History", "*", "*")
+        for game in game_summary:
+            print()
+            print(game)
+            print()
 
-    # Displays game stats with % values to the nearest whole number
-    print()
-    print("**** Game Statistics ****")
-    print("Win: {}: ({:.0f}%)\nLoss: {}: ({:.0f}%)".format(rounds_won, percent_win, rounds_lost, percent_lose))
-    print()
-    print()
-    print("Thanks for playing")
-    
-elif game_results == "no":
-    print()
-    print("Thanks for playing")
+
+
+    # Doesnt display history if user says no
+    elif show_history == "no":
+        print()
+        statement_generator("Thanks for Playing", "-", "*")
+
+    # asks user if they want to see the game stats
+    game_results = yes_no("Do you want to see your game stats? ")
+
+    if game_results == "yes":
+
+        # Displays game stats with % values to the nearest whole number
+        print()
+        statement_generator(" Game Statistics ", "+", "-")
+        print("Win: {}: ({:.0f}%)\nLoss: {}: ({:.0f}%)".format(rounds_won, percent_win, rounds_lost, percent_lose))
+        print()
+        print()
+        print("Thanks for playing")
+        
+    elif game_results == "no":
+        statement_generator("Thanks for Playing", "-", "*")
+    statement_generator("", "", "")
+
+    # Asks user if they want to play again
+    play_again = yes_no("Do you want to play again? ")
+
+    if play_again == "yes":
+        continue
+    else:
+        break
