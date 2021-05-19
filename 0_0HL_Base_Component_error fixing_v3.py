@@ -143,48 +143,6 @@ if show_instructions == "no":
     print()
     
       
-mode = mode_checker(
-    "Do you want to play mode 1 (normal mode), \n"
-    "or mode 2 (infinite mode)? ", "PLease enter either '1' or '2'"
-)
-
-
-# Initial setup gets range
-num_won = 0
-print()
-lowest = num_check("Low Number: ", "Enter an integer above 0", 1)
-
-highest = num_check("High Number: ", "Please enter a integer above {}".format(lowest), lowest + 1)
-print()
-
-# set up rounds variables
-rounds_lost = 0
-rounds_played = 0
-rounds_won = 0
-
-# Gets number of rounds
-if mode == 1:
-    # ask how many rounds user wants to play
-    rounds_allowed = num_check("How many rounds? ", "Please enter an integer above 0", 1, exit_code="")
-    rounds = rounds_allowed
-    print()
-elif mode == 2:
-    rounds_allowed = 5
-    rounds = rounds_allowed
-
-# list to hold user guesses and help prevent duplicates
-already_guessed = []
-
-# calculates maximum number of guesses based on binary search strategy
-num_range = highest - lowest + 1
-max_raw = math.log2(num_range)
-max_upped = math.ceil(max_raw)
-max_guesses = max_upped + 1
-guesses_allowed = max_guesses
-
-# display how many guesses the user has
-statement_generator("Max Guesses per round: {}".format(max_guesses), "-", "")
-
 
 # loops the code
 guess = ""
@@ -192,8 +150,49 @@ play_again = "yes"
 
 # makes sure that user plays for specified amount of rounds
 while play_again == "yes":
-    rounds = rounds_allowed
-    guess = 10000000
+    mode = mode_checker(
+    "Do you want to play mode 1 (normal mode), \n"
+    "or mode 2 (infinite mode)? ", "PLease enter either '1' or '2'"
+    )
+
+
+    # Initial setup gets range
+    num_won = 0
+    print()
+    lowest = num_check("Low Number: ", "Enter an integer above 0", 1)
+
+    highest = num_check("High Number: ", "Please enter a integer above {}".format(lowest), lowest + 1)
+    print()
+
+    # set up rounds variables
+    rounds_lost = 0
+    rounds_played = 0
+    rounds_won = 0
+
+    # Gets number of rounds
+    if mode == 1:
+        # ask how many rounds user wants to play
+        rounds_allowed = num_check("How many rounds? ", "Please enter an integer above 0", 1, exit_code="")
+        rounds = rounds_allowed
+        print()
+    elif mode == 2:
+        rounds_allowed = 5
+        rounds = rounds_allowed
+
+    # list to hold user guesses and help prevent duplicates
+    already_guessed = []
+
+    # calculates maximum number of guesses based on binary search strategy
+    num_range = highest - lowest + 1
+    max_raw = math.log2(num_range)
+    max_upped = math.ceil(max_raw)
+    max_guesses = max_upped + 1
+    guesses_allowed = max_guesses
+
+    # display how many guesses the user has
+    statement_generator("Max Guesses per round: {}".format(max_guesses), "-", "")
+
+
     while rounds_played < rounds:
 
         guesses_allowed = max_guesses
@@ -355,6 +354,8 @@ while play_again == "yes":
     play_again = yes_no("Do you want to play again? ")
 
     if play_again == "yes":
+        print()
+        print()
         continue
     else:
         break
