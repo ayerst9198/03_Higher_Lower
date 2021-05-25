@@ -86,28 +86,6 @@ def yes_no(question):
             print("Please input yes / no")
 
 
-# confines answer to either 1 or 2 for mode choice
-def mode_checker(question, error):
-    valid = False
-    while not valid:
-        try: 
-            response = int(input(question))
-
-            if response == 1:
-                response = 1
-                return response
-            
-            elif response == 2:
-                response = 2
-                return response
-        
-            else:
-                print("Please enter either '1' or '2'")
-        except ValueError:
-            print(error)
-            print()
-
-
 # Instructions
 def instructions():
     statement_generator("How to PLay", "*", "-")
@@ -150,10 +128,14 @@ play_again = "yes"
 
 # makes sure that user plays for specified amount of rounds
 while play_again == "yes":
-    mode = mode_checker(
+    ''' mode = mode_checker(
     "Do you want to play mode 1 (normal mode), \n"
     "or mode 2 (infinite mode)? ", "PLease enter either '1' or '2'"
-    )
+    ) '''
+
+    mode_question = "Do you want to play mode 1 (normal mode) or mode 2 (infinite mode)? "
+    mode_error = "Please enter either 1 or 2"
+    mode = num_check(mode_question, mode_error, 1, 2)
 
 
     # Initial setup gets range
@@ -172,12 +154,11 @@ while play_again == "yes":
     # Gets number of rounds
     if mode == 1:
         # ask how many rounds user wants to play
-        rounds_allowed = num_check("How many rounds? ", "Please enter an integer above 0", 1, exit_code="")
-        rounds = rounds_allowed
+        rounds = num_check("How many rounds? ", "Please enter an integer above 0", 1, exit_code="")
+
         print()
-    elif mode == 2:
-        rounds_allowed = 5
-        rounds = rounds_allowed
+    else:
+        rounds = 5
 
     # list to hold user guesses and help prevent duplicates
     already_guessed = []
